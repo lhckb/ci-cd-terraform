@@ -24,6 +24,14 @@ jobs:
       with:
         terraform_version: 1.11.1
 
+    - name: Configurar kubectl
+      run: |
+        aws eks update-kubeconfig --region eu-central-1 --name eksDeepDiveFrankfurt        
+
+    - name: Deletar deployment Kubernetes antigo (se existir)
+      run: |
+        kubectl delete deployment todo-app-leam-lhcc --ignore-not-found
+
     - name: Criar repositório ECR
       run: |
         terraform init
@@ -42,10 +50,6 @@ jobs:
     - name: Criar infra completa (EKS etc.)
       run: |
         terraform apply -auto-approve
-
-    - name: Configurar kubectl
-      run: |
-        aws eks update-kubeconfig --region eu-central-1 --name eksDeepDiveFrankfurt
 
     - name: Aplicar manifestos Kubernetes
       run: |
