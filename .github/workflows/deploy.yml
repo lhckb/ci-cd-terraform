@@ -13,6 +13,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Verificar AWS_ACCESS_KEY_ID
+      run: |
+        if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
+          echo "AWS_ACCESS_KEY_ID não está configurado!"
+          exit 1
+        else
+          echo "AWS_ACCESS_KEY_ID está configurado."
+        fi
+
     - name: Configurar credenciais AWS
       uses: aws-actions/configure-aws-credentials@v2
       with:
