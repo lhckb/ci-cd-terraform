@@ -33,6 +33,7 @@ jobs:
     - name: Buildar e publicar imagem no ECR
       run: |
         terraform init
+        terraform plan
         terraform apply -target=aws_ecr_repository.todo_app -auto-approve
         docker build -t todo-app ./todo-app
         docker tag todo-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
@@ -41,4 +42,5 @@ jobs:
     - name: Deploy Infra + Kubernetes
       run: |
         # terraform init
+        terraform plan
         terraform apply -auto-approve
