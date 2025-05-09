@@ -45,6 +45,7 @@ module "data_sources" {
 
 module "k8s_app" {
   source = "./modules/k8s_app"
+  ecr_repository_url = module.ecr.repository_url
 }
 
 module "ecr" {

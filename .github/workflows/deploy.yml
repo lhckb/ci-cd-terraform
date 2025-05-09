@@ -13,15 +13,6 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Verificar AWS_ACCESS_KEY_ID
-      run: |
-        if [ -z "${{ secrets.AWS_ACCESS_KEY_ID }}" ]; then
-          echo "AWS_ACCESS_KEY_ID não está configurado!"
-          exit 1
-        else
-          echo "AWS_ACCESS_KEY_ID está configurado."
-        fi
-
     - name: Configurar credenciais AWS
       uses: aws-actions/configure-aws-credentials@v2
       with:
@@ -36,8 +27,8 @@ jobs:
     - name: Buildar e publicar imagem no ECR
       run: |
         docker build -t todo-app ./todo-app
-        docker tag todo-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-repo:latest
-        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-repo:latest
+        docker tag todo-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
 
     - name: Deploy Kubernetes
       run: |

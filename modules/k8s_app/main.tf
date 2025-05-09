@@ -26,7 +26,7 @@ resource "kubernetes_deployment" "todo_app" {
         container {
           name  = "todo"
           # image = "lhcc2025/getting-started@sha256:c4ade342dd31d5c2d39556730797e853665dbfa4f329f3186b89df71a68eb96d"
-          image = "${aws_ecr_repository.todo_app_repo.repository_url}:latest"
+          image = "${var.ecr_repository_url}:latest"
           port {
             container_port = 3000
           }
