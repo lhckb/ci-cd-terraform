@@ -28,11 +28,12 @@ jobs:
     - name: Log AWS ECR
       run: |
         aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com
+        aws sts get-caller-identity
 
     - name: Buildar e publicar imagem no ECR
       run: |
         terraform init
-        terraform apply -target=module.ecr
+        terraform apply
         docker build -t todo-app ./todo-app
         docker tag todo-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
