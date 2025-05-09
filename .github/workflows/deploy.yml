@@ -1,16 +1,15 @@
-name: ATV 04 - Deploy no EKS
+name: Deploy EKS + ECR
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
+    - name: Checkout código
       uses: actions/checkout@v3
 
     - name: Configurar credenciais AWS
@@ -23,24 +22,31 @@ jobs:
     - name: Instalar Terraform
       uses: hashicorp/setup-terraform@v2
       with:
-        terraform_version: 1.11.1      
+        terraform_version: 1.11.1
 
-    - name: Log AWS ECR
-      run: |
-        aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com
-        aws sts get-caller-identity
-
-    - name: Buildar e publicar imagem no ECR
+    - name: Criar repositório ECR
       run: |
         terraform init
-        terraform plan
-        terraform apply -target=aws_ecr_repository.todo_app_repo -auto-approve
+        terraform apply -target=module.aws_ecr_repository.todo_app_repo -auto-approve
+
+    - name: Login no ECR
+      run: |
+        aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com
+
+    - name: Build e push da imagem Docker
+      run: |
         docker build -t todo-app ./todo-app
         docker tag todo-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
         docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
 
-    - name: Deploy Infra + Kubernetes
+    - name: Criar infra completa (EKS etc.)
       run: |
-        # terraform init
-        terraform plan
         terraform apply -auto-approve
+
+    - name: Configurar kubectl
+      run: |
+        aws eks update-kubeconfig --region eu-central-1 --name eksDeepDiveFrankfurt
+
+    - name: Aplicar manifestos Kubernetes
+      run: |
+        kubectl apply -f k8s/
