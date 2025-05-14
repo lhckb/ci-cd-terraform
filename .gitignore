@@ -1,0 +1,57 @@
+# Arquivos locais do Terraform
+.terraform/
+.terraform.lock.hcl
+
+# Arquivos de estado do Terraform
+terraform.tfstate
+terraform.tfstate.backup
+
+# Logs e arquivos de crash do Terraform
+crash.log
+
+# Arquivos de variáveis sensíveis
+*.tfvars
+*.tfvars.json
+
+# Arquivos de saída do plano do Terraform
+*.tfplan
+
+# Arquivos de configuração locais
+.terraformrc
+terraform.rc
+
+# Arquivos do macOS
+.DS_Store
+
+# Arquivos e diretórios comuns em projetos JavaScript/Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Diretórios de build
+dist/
+build/
+
+# Arquivos de ambiente
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+
+# Cache do npm/yarn/pnpm
+.npm/
+.yarn/
+.pnp/
+.pnp.js
+
+# Configurações locais de IDEs
+.vscode/
+.idea/

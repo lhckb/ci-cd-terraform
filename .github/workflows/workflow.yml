@@ -1,0 +1,57 @@
+name: Deploy EKS + ECR
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v3
+
+    - name: Configurar credenciais AWS
+      uses: aws-actions/configure-aws-credentials@v2
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+
+    - name: Instalar Terraform
+      uses: hashicorp/setup-terraform@v2
+      with:
+        terraform_version: 1.11.1
+
+    - name: Criar repositório ECR
+      run: |
+        terraform init
+        terraform apply -target=module.aws_ecr_repository.todo_app_repo -auto-approve
+
+    - name: Login no ECR
+      run: |
+        aws ecr get-login-password --region eu-central-1 | docker login --username AWS --password-stdin ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com
+
+    - name: Build e push da imagem Docker
+      run: |
+        docker build -t todo-app ./todo-app
+        docker tag todo-app:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
+        docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.eu-central-1.amazonaws.com/todo-app-leam-lhcc:latest
+
+    - name: Criar infra completa (EKS etc.)
+      run: |
+        terraform apply -auto-approve
+
+    - name: Configurar kubectl
+      run: |
+        aws eks update-kubeconfig --region eu-central-1 --name nome-do-seu-cluster
+
+    - name: Remover deployment antigo (evita erro de duplicata)
+      run: |
+        kubectl delete deployment todo-app-leam-lhcc --ignore-not-found
+
+    # - name: Aplicar manifestos Kubernetes
+    #   run: |
+    #     kubectl apply -f k8s/
+
