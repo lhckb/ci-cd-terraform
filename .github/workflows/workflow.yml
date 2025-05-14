@@ -27,6 +27,7 @@ jobs:
     - name: Criar repositório ECR
       run: |
         terraform init
+        terraform plan
         terraform apply -target=module.ecr -auto-approve
 
     - name: Login no ECR
